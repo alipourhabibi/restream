@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "usersinfo/";
+
+message UsersInfoRequest {
+	string key = 1;
+}
+
+message UsersInfoResponse {
+	bool auth = 1;
+	string TwitchKey = 2;
+	string YoutubeKey = 3;
+	string AparatKey = 4;
+}
+
+service UsersInfo {
+	rpc Get(UsersInfoRequest) returns (UsersInfoResponse);
+}
