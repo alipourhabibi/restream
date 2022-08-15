@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/alipourhabibi/restream/grpcclient"
 	"github.com/alipourhabibi/restream/settings"
 )
 
@@ -18,8 +17,4 @@ func main() {
 	}
 	l := log.Logger{}
 	l.SetOutput(logfile)
-
-	// Setting Up client grpc
-	grpcClient := grpcclient.NewUsersInfo(&l)
-	grpcClient.SetUp()
 }
