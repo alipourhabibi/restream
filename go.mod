@@ -3,6 +3,8 @@ module github.com/alipourhabibi/restream
 go 1.19
 
 require (
+	github.com/nareix/joy4 v0.0.0-20200507095837-05a4ffbb5369
+	github.com/praveen001/joy4 v0.0.0-20181220185709-7181f3f7230f
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/gcfg.v1 v1.2.3

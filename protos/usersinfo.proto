@@ -5,11 +5,16 @@ message UsersInfoRequest {
 	string key = 1;
 }
 
+message Channel {
+	string Name = 1;
+	string Key = 2;
+}
+
 message UsersInfoResponse {
 	bool auth = 1;
-	string TwitchKey = 2;
-	string YoutubeKey = 3;
-	string AparatKey = 4;
+	Channel Twitch = 2;
+	Channel Youtube = 3;
+	Channel Aparat = 4;
 }
 
 service UsersInfo {

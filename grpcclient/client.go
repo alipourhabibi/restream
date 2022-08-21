@@ -1,7 +1,6 @@
 package grpcclient
 
 import (
-	"context"
 	"fmt"
 	"log"
 
@@ -29,8 +28,8 @@ func NewUsersInfo(log *log.Logger) *UsersInfo {
 }
 
 // Get method is used to get user's data including keys from grpc server
-func (u *UsersInfo) Get(key string) (bool, Keys) {
-	creds, err := credentials.NewClientTLSFromFile("certfiles/cert.pem", "")
+func (u *UsersInfo) GetClient() protos.UsersInfoClient {
+	creds, err := credentials.NewClientTLSFromFile("certfiles/grpc/cert.pem", "")
 	if err != nil {
 		u.log.Println(err.Error())
 	}
@@ -39,25 +38,9 @@ func (u *UsersInfo) Get(key string) (bool, Keys) {
 	if err != nil {
 		u.log.Println(err.Error())
 	}
-	defer con.Close()
 
 	// UsersInfo Client
-	info := protos.NewUsersInfoClient(con)
+	client := protos.NewUsersInfoClient(con)
 
-	request := &protos.UsersInfoRequest{
-		Key: key,
-	}
-	response, err := info.Get(context.Background(), request)
-	if err != nil {
-		u.log.Println(err.Error())
-	}
-
-	keys := Keys{}
-
-	auth := response.GetAuth()
-	keys.Twitch = response.GetTwitchKey()
-	keys.Youtube = response.GetYoutubeKey()
-	keys.Aparat = response.GetAparatKey()
-
-	return auth, keys
+	return client
 }

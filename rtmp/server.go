@@ -2,23 +2,28 @@ package rtmp
 
 import (
 	"bufio"
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
 
+	"github.com/alipourhabibi/restream/grpcclient"
+	protos "github.com/alipourhabibi/restream/protos/usersinfo"
 	"github.com/alipourhabibi/restream/settings"
 )
 
 // Stream is the entrypoint for handling incoming rtmp request for streaming
 type Stream struct {
 	log *log.Logger
+	RPC protos.UsersInfoClient
 }
 
 // NewStream returns Steam struct which is for starting streaming service
 func NewStream(log *log.Logger) *Stream {
+	uInfo := grpcclient.NewUsersInfo(log)
+	client := uInfo.GetClient()
 	return &Stream{
 		log: log,
+		RPC: client,
 	}
 }
 
@@ -27,31 +32,12 @@ func (s *Stream) InitStream() {
 
 	var ln net.Listener
 	var err error
-	runMode := settings.ServerSettings.Items.RunMode
 	laddr := fmt.Sprintf(":%d", settings.ServerSettings.Items.Port)
-
-	if runMode == "Release" {
-		cert, err := tls.LoadX509KeyPair("certfiles/general/cert.pem", "certfiles/general/key.pem")
-		if err != nil {
-			panic(err)
-		}
-		config := &tls.Config{Certificates: []tls.Certificate{cert}}
-		ln, err = tls.Listen("tcp", laddr, config)
-		if err != nil {
-			panic(err)
-		}
-		defer ln.Close()
-	} else if runMode == "Debug" {
-		ln, err = net.Listen("tcp", laddr)
-		if err != nil {
-			panic(err)
-		}
-		defer ln.Close()
-	} else {
-		fmt.Println("[ERROR] Invalid RunMode")
-		return
+	ln, err = net.Listen("tcp", laddr)
+	if err != nil {
+		panic(err)
 	}
-
+	defer ln.Close()
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -59,13 +45,22 @@ func (s *Stream) InitStream() {
 			continue
 		}
 
+		ctx := &StreamContext{}
+		ctx.sessions = make(map[string]*Connection)
+
 		c := &Connection{
-			log:         s.log,
-			Conn:        conn,
-			Reader:      bufio.NewReader(conn),
-			Writer:      bufio.NewWriter(conn),
-			ReadBuffer:  make([]byte, 5096),
-			WriteBuffer: make([]byte, 5096),
+			log:               s.log,
+			Conn:              conn,
+			Reader:            bufio.NewReader(conn),
+			Writer:            bufio.NewWriter(conn),
+			ReadBuffer:        make([]byte, 5096),
+			WriteBuffer:       make([]byte, 5096),
+			csMap:             make(map[uint32]*rtmpChunk),
+			RPC:               s.RPC,
+			ReadMaxChunkSize:  128,
+			WriteMaxChunkSize: 4096,
+			Stage:             handshakeStage,
+			Context:           ctx,
 		}
 		go c.Handle()
 	}

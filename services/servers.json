@@ -1,0 +1,31 @@
+{
+	"services": [
+		{
+			"Name": "Twitch",
+			"servers": [
+				{
+					"Name": "Europe: Czech Republic, Prague",
+					"url": "rtmp://prg03.contribute.live-video.net/app"
+				}
+			]
+		},
+		{
+			"Name": "Youtube",
+			"servers": [
+				{
+					"Name": "Primary YouTube ingest server",
+					"url": "rtmp://a.rtmps.youtube.com:443/live2"
+				}
+			]
+		},
+		{
+			"Name": "Aparat",
+			"servers": [
+				{
+					"Name": "Default",
+					"url": "rtmp://rtmp.cdn.asset.aparat.com:443/event"
+				}
+			]
+		}
+	]
+}

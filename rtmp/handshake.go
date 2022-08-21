@@ -87,6 +87,6 @@ func (c *Connection) handshake() error {
 		return err
 	}
 
-	fmt.Println("handshake DONE")
+	c.Stage++
 	return nil
 }
